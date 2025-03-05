@@ -250,8 +250,12 @@ async def process_comment(message: types.Message, state: FSMContext, bot: Bot):
                 "❌ Ошибка: выбранный торт не найден. Попробуйте снова."
             )
             return
-        cake_price = selected_cake.price
+
+        final_price = selected_cake.price
         cake_name = selected_cake.name
+
+        if cake_text and cake_text.lower() != "нет":
+            final_price += 500
 
         # Создаём заказ для стандартного торта
         cake_order = CakeOrder(
@@ -259,7 +263,7 @@ async def process_comment(message: types.Message, state: FSMContext, bot: Bot):
             cake_text=cake_text,
             address=address,
             comment=comment,
-            price=cake_price,
+            price=final_price,
             telegram_id=message.from_user.username,
         )
 
@@ -273,16 +277,17 @@ async def process_comment(message: types.Message, state: FSMContext, bot: Bot):
 
         await message.answer(
             f"✅ Ваш заказ оформлен!\n\n"
-            f"Вы выбрали: {cake_name} - {cake_price} руб.\n"
+            f"Вы выбрали: {cake_name}\n"
             f"Дополнительно: {'Текст на торте: ' + cake_text if cake_text else 'Без надписи'}\n"
             f"📍 Адрес доставки: {address}\n"
-            f"💬 Пожелания: {comment}\n\n"
+            f"💬 Пожелания: {comment}\n"
+            f"💰 Итоговая цена: {final_price} руб.\n\n"
             f"Спасибо, что выбрали нас! 🎂"
         )
     else:
         # Создаём кастомный торт
         selected_cake = CustomCake(
-            levels=user_data.get("levels", 1),
+            levels= int(user_data.get("levels", 1)),
             shape=user_data.get("shape", "round"),
             topping=user_data.get("topping", "none"),
             berries=user_data.get("berry", "none"),
@@ -298,8 +303,13 @@ async def process_comment(message: types.Message, state: FSMContext, bot: Bot):
 
         # Создаём заказ для кастомного торта
         custom_cake_order = CustomCakeOrder(
-            custom_cake=selected_cake,  # Привязываем кастомный торт
+            custom_cake=selected_cake,
             cake_text=cake_text,
+            levels=int(user_data.get("levels", 1)),
+            shape=user_data.get("shape", "round"),
+            topping=user_data.get("topping", "none"),
+            berries=user_data.get("berry", "none"),
+            decor=user_data.get("decor", "none"),
             address=address,
             comment=comment,
             price=cake_price,
