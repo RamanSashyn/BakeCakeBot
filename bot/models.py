@@ -117,7 +117,7 @@ class CustomCake(models.Model):
 
     def __str__(self):
         return (
-            f"Кастомный торт ({self.levels} уровня, {self.shape}) - {self.price} руб."
+            f"Кастомный торт"
         )
 
 
@@ -166,10 +166,10 @@ class CustomCakeOrder(models.Model):
         auto_now_add=True, verbose_name="Дата оформления заказа"
     )
     telegram_id = models.CharField(max_length=255, null=True, blank=True)
-    shape = models.CharField(max_length=20, verbose_name="Форма", default="round")
     levels = models.IntegerField(
         verbose_name="Уровни", null=True, blank=True, default=1
     )
+    shape = models.CharField(max_length=20, verbose_name="Форма", default="round")
     topping = models.CharField(
         max_length=20, verbose_name="Топпинг", null=True, blank=True, default="none"
     )
